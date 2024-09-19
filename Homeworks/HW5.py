@@ -64,7 +64,7 @@ def better_bisection(f, a, b, max_iter, tolerance):
     # abs(b-a) < tolerance * 2**n
     # abs(b-a)/tolerance < 2**n
     # log_2(abs(b-a)/tolerance) = n
-    num_of_iter = math.ceil(math.log2(abs(b-a)/tolerance))
+    num_of_iter = abs(math.ceil(math.log2(abs(b-a)/tolerance)))
 
     # If precision cannot be achieved by the algo, don't run it.
     if max_iter < num_of_iter:
@@ -74,7 +74,7 @@ def better_bisection(f, a, b, max_iter, tolerance):
     fa = f(a)
     fb = f(b)
 
-    # If the signs aren't the same, the condition doesn't match to run this algo
+    # If the signs aren't the same, the condition doesn't match to run this algo (saves from underflow)
     if np.sign(fa) == np.sign(fb):
         return False, 0
 
