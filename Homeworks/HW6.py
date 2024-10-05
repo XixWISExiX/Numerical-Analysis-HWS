@@ -1,42 +1,36 @@
 # Computer Problem Portion of HW5
 import numpy as np
 
-def newtonsMethod(f, f_prime, x0, max_iter, tolerance, see_steps=False):
+def newtonsMethod(f, df, x, max_iterations, epsilon, delta, see_steps=False):
     """
-    Approximates a root p given an initial point x0 for a function f with
-    error smaller than a given tolerance.
-    Note that f, f', and f'' must be continuous in the neighborhood of the root.
-    :param f: function whose root is approximated
-    :param f_prime: the derivative of function f
-    :param x0: the starting point for which the fucntion
-    :param max_iter: maximum number of iteration to reach the tolerance
-    :param tolerance: maximal allowed error
+    The function approximates a root of the function f
+    starting from the initial guess x
+    :param f: formula for the function
+    :param df: formula for the derivative of the function
+    :param x: initial guess of a root
+    :param max_iterations: maximal numberof iterations to be performed
+    :param epsilon: parameter for evaluating the accuracy
+    :param delta: lower bound on the value of the derivative
+    :return: converge: indicates if the method converged 'close' to a root
+    :return: root: approximation of the root
     """
+    for n in range(1, max_iterations + 1):
+        fx = f(x)
+        dfx = df(x)
 
-    p = x0
-    for i in range(max_iter):
-        fp = f(p)
-        f_prime_p = f_prime(p)
-        if see_steps:
-            print('Step',i+1, 'x =',p, '| f(p) =', fp, "| f'(p) =", f_prime_p)
+        if np.abs(dfx) < delta:
+            return False, 0
+        
+        h = fx / dfx
+        x = x-h
 
-        # Avoid division by zero
-        if f_prime_p == 0:
-            print("Division by 0, cannot Converge")
-            return False, -1
+        if see_steps: print('Step', n, '| x =', x)
 
-        step = p - fp/f_prime_p
 
-        # Check for convergence
-        if fp == 0 or abs(step - p) < tolerance:
-            print(f"Converged in {i+1} iterations.")
-            return True, step
+        if np.abs(h) < epsilon:
+            return True, x
 
-        p = step 
-
-    # Never Converged
-    print("Never Converged p =", p)
-    return False, 0
+    return False, x
 
 # Given bisection algorithm
 def bisection(f, a, b, max_iter, tolerance, see_steps=False):
@@ -99,11 +93,11 @@ def f_prime(x):
     """
     return 5*x**4 - 36*x**3 - 3*x**2 + 34*x - 8
 
-x = 0
-max_iter = 10
+max_iter = 100
 tolerance = 10 ** (-9)
+delta = 0.000001
 
-print(newtonsMethod(f, f_prime, x, max_iter, tolerance, see_steps=True))
+print(newtonsMethod(f, f_prime, 0, max_iter, tolerance, delta, see_steps=False))
 print()
 print("Newtons Method with a starting point of x0 = 0 never converges.")
 print("The point p oscillates between 0, -1, and 1 as shown by the printed steps taken.")
@@ -151,16 +145,16 @@ tolerance = 10 ** (-9)
 #     x = value+(i*0.01)
 #     print("Value x =", x, "| f(x) =", (x) - np.tan(x))
 
-print('Best Range is 98 to 98.96 for bisection method and these values where found using the above commented out code')
+print('Best Range is 98 to 98.95 for bisection method and these values where found using the above commented out code')
 print('Where when one point goes from positive to negative being the main indecator of when passing through 0.')
 print("Best starting point for Newton's Method is 98.96 because that's when the value crosses y=0 near 99 radians")
 print()
 
-print("Newton's Method:", newtonsMethod(f, f_prime, 98.96, max_iter, tolerance, see_steps=True))
+print("Newton's Method:", newtonsMethod(f, f_prime, 98.95, max_iter, tolerance, delta, see_steps=False))
 print()
 
 
-print("Bisection Method:", bisection(f, 98, 98.96, max_iter, tolerance, see_steps=True))
+print("Bisection Method:", bisection(f, 98, 98.95, max_iter, tolerance, see_steps=False))
 
 ########################################################################################
 # C3
@@ -205,8 +199,8 @@ print("Function we measure the distance between the current step and the previou
 print("that our precision is better than 10^5.")
 print()
 
-print("Newton's Method for Root 1:", newtonsMethod(f, f_prime, 0.8, max_iter, tolerance, see_steps=True))
-print("Newton's Method for Root 2:", newtonsMethod(f, f_prime, 1.6, max_iter, tolerance, see_steps=True))
+print("Newton's Method for Root 1:", newtonsMethod(f, f_prime, 0.8, max_iter, tolerance, delta, see_steps=False))
+print("Newton's Method for Root 2:", newtonsMethod(f, f_prime, 1.6, max_iter, tolerance, delta, see_steps=False))
 
 ########################################################################################
 # C4
@@ -244,7 +238,7 @@ def f_prime(x):
 max_iter = 1000
 tolerance = 10 ** (-6)
 
-print("Newton's Method:", newtonsMethod(f, f_prime, 1.1, max_iter, tolerance, see_steps=True))
+print("Newton's Method:", newtonsMethod(f, f_prime, 1.1, max_iter, tolerance, delta, see_steps=False))
 
 print("The sequence produced by Newton's method doesn't converge quadratically to the root r = 1.")
 print("We can see this through the iterations going on when we use Newton's Method at x = 1.1")
@@ -289,14 +283,14 @@ tolerance = 10 ** (-6)
 #     print("Value x =", x, "| f(x) =", f(x))
 
 print("Looping through values 0 to 4 with each iteration being at 0.01, we can see 3.13 is very close to 0.")
-print("Newton's Method root in range [0,4]:", newtonsMethod(f, f_prime, 3.13, max_iter, tolerance, see_steps=False))
+print("Newton's Method root in range [0,4]:", newtonsMethod(f, f_prime, 3.13, max_iter, tolerance, delta, see_steps=False))
 
 print()
 print("When x0 = 0, the equation never converges because f'(0) = 0")
-print("Newton's Method:", newtonsMethod(f, f_prime, 0, max_iter, tolerance, see_steps=False))
+print("Newton's Method:", newtonsMethod(f, f_prime, 0, max_iter, tolerance, delta, see_steps=False))
 print()
 print("When x0 = 1, the equation converges at some point where x_hat = 9")
-print("Newton's Method:", newtonsMethod(f, f_prime, 1, max_iter, tolerance, see_steps=False))
+print("Newton's Method:", newtonsMethod(f, f_prime, 1, max_iter, tolerance, delta, see_steps=False))
 
 ########################################################################################
 # C6
@@ -353,17 +347,17 @@ def g_prime(x):
     # return m*x**(m-1)
     return (x*(m*R-x**m+R))/(m*R)
 
-max_iter = 1000
+max_iter = 100
 tolerance = 10 ** (-9)
 
-print("Newton's Method Formula 1, x0 = 10:", newtonsMethod(f, f_prime, 10, max_iter, tolerance, see_steps=False))
-print("Newton's Method Formula 2, x0 = 10:", newtonsMethod(g, g_prime, 10, max_iter, tolerance, see_steps=False))
+print("Newton's Method Formula 1, x0 = 10:", newtonsMethod(f, f_prime, 10, max_iter, tolerance, delta, see_steps=False))
+print("Newton's Method Formula 2, x0 = 10:", newtonsMethod(g, g_prime, 10, max_iter, tolerance, delta, see_steps=False))
 print('Formula one convergest when x0 = 10, but Formula two results in an divergence')
 print()
 
-print("Newton's Method Formula 1, x0 = 1:", newtonsMethod(f, f_prime, 1, max_iter, tolerance, see_steps=False))
-print("Newton's Method Formula 2, x0 = 1:", newtonsMethod(g, g_prime, 1, max_iter, tolerance, see_steps=False))
-print('Formula one and two both converge when x0 = 1')
+print("Newton's Method Formula 1, x0 = 1:", newtonsMethod(f, f_prime, 1, max_iter, tolerance, delta, see_steps=False))
+print("Newton's Method Formula 2, x0 = 1:", newtonsMethod(g, g_prime, 1, max_iter, tolerance, delta, see_steps=False))
+print('Formula one and two both converge when x0 = 1, however they converge to different values.')
 print()
 
 print('---')
@@ -416,19 +410,19 @@ def g_prime(x):
 
 
 
-print("Newton's Method Formula 1, x0 = 2:", newtonsMethod(f, f_prime, 2, max_iter, tolerance, see_steps=False))
-print("Newton's Method Formula 2, x0 = 2:", newtonsMethod(g, g_prime, 2, max_iter, tolerance, see_steps=False))
+print("Newton's Method Formula 1, x0 = 2:", newtonsMethod(f, f_prime, 2, max_iter, tolerance, delta, see_steps=False))
+print("Newton's Method Formula 2, x0 = 2:", newtonsMethod(g, g_prime, 2, max_iter, tolerance, delta, see_steps=False))
 print("Formula one results in convergence, Formula two results in divergence")
 print()
 
-print("Newton's Method Formula 1, x0 = 1:", newtonsMethod(f, f_prime, 1, max_iter, tolerance, see_steps=False))
-print("Newton's Method Formula 2, x0 = 1:", newtonsMethod(g, g_prime, 1, max_iter, tolerance, see_steps=False))
-print('Formula one and two both converge when x0 = 1')
+print("Newton's Method Formula 1, x0 = 1:", newtonsMethod(f, f_prime, 1, max_iter, tolerance, delta, see_steps=False))
+print("Newton's Method Formula 2, x0 = 1:", newtonsMethod(g, g_prime, 1, max_iter, tolerance, delta, see_steps=False))
+print('Formula one and two both converge when x0 = 1, however they converge to different values.')
 print()
 
-print("Newton's Method Formula 1, x0 = 0.1:", newtonsMethod(f, f_prime, 0.1, max_iter, tolerance, see_steps=False))
-print("Newton's Method Formula 2, x0 = 0.1:", newtonsMethod(g, g_prime, 0.1, max_iter, tolerance, see_steps=False))
-print('Formula one and two both converge when x0 = 1')
+print("Newton's Method Formula 1, x0 = 0.1:", newtonsMethod(f, f_prime, 0.1, max_iter, tolerance, delta, see_steps=False))
+print("Newton's Method Formula 2, x0 = 0.1:", newtonsMethod(g, g_prime, 0.1, max_iter, tolerance, delta, see_steps=False))
+print('Formula one and two both converge when x0 = 1, however they converge to different values.')
 print()
 
 ########################################################################################
@@ -485,4 +479,4 @@ print("To find d'(p) = 0, where d is the point vs line equation which we will se
 print("This mean we must find the d''(p) in order to find the next point with Newton's method.")
 print('x0 was found by finding the d_prime values from -2 to 2 with step distance 0.1, of which 0.7 was')
 print('one of these values.')
-print("Newton's Method:", newtonsMethod(d_prime, d_double_prime, 0.7, max_iter, tolerance, see_steps=False))
+print("Newton's Method:", newtonsMethod(d_prime, d_double_prime, 0.7, max_iter, tolerance, delta, see_steps=False))
